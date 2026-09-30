@@ -23,3 +23,10 @@ String apiErrorMessage(Object error, String fallback) {
   final detail = data is Map<String, dynamic> ? data['detail'] : null;
   return detail is String && detail.trim().isNotEmpty ? detail : fallback;
 }
+
+/// Riverpod retries failed providers by default, 4xx included. Use this as the `retry`
+/// of API-backed providers: only transient failures (network, 5xx), a few times, backing off.
+Duration? retryTransient(int count, Object error) =>
+    count < 3 && error is DioException && isRetryable(error)
+    ? Duration(seconds: 1 << count)
+    : null;

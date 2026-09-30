@@ -101,14 +101,7 @@ class SessionController extends AsyncNotifier<UserRead?> {
   void expire() => state = const AsyncData(null);
 }
 
-/// Riverpod retries failed providers by default, 4xx included. A session check only
-/// retries transient failures (network, 5xx), a few times.
-Duration? _retry(int count, Object error) =>
-    count < 3 && error is DioException && isRetryable(error)
-    ? Duration(seconds: 1 << count)
-    : null;
-
 final sessionProvider = AsyncNotifierProvider<SessionController, UserRead?>(
   SessionController.new,
-  retry: _retry,
+  retry: retryTransient,
 );
