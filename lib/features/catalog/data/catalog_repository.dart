@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/api/endpoints.dart';
+import '../../../core/api/providers.dart';
 import 'category.dart';
 import 'common.dart';
 import 'product.dart';
@@ -133,11 +134,6 @@ class CatalogRepository {
     return ShopPublicRead.fromJson(response.data!);
   }
 }
-
-/// Override with the app's shared `Dio` (see `createApiClient`).
-final dioProvider = Provider<Dio>(
-  (ref) => throw UnimplementedError('dioProvider not overridden'),
-);
 
 final catalogRepositoryProvider = Provider<CatalogRepository>(
   (ref) => CatalogRepository(ref.watch(dioProvider)),
