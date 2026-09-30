@@ -1,0 +1,26 @@
+name: market_app
+description: "emarket customer mobile app."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  cookie_jar: ^4.0.9
+  dio: ^5.11.1
+  dio_cookie_manager: ^3.5.0
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.2
+  path_provider: ^2.1.6
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
