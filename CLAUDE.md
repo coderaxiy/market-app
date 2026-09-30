@@ -16,5 +16,12 @@ Read first: `.claude/skills/mobile-app/SKILL.md` (conventions), then the sibling
 1. Work in phases of **≤5 files**, verify, then stop for owner approval.
 2. Done = `dart format --set-exit-if-changed .`, `flutter analyze` (zero issues) and
    `flutter test` all clean.
-3. Never edit `sdk-contract/openapi/` or `sdk-contract/sdk/`. Contract changes go through tasks.
+3. `sdk-contract` is the shared channel between backend, frontend and mobile: read it for the
+   spec, docs and types, and read/write files in its `tasks/`. **Touch nothing else in it**;
+   never edit `openapi/`, `sdk/`, `docs/` or scripts. Contract changes go through tasks.
 4. Branch: develop on `claude/friendly-ptolemy-hlsoug`; no PRs unless asked.
+
+## Session start
+
+Pull `sdk-contract`, then `npm run tasks` there. Work the open tasks with `to: mobile`; leave
+tasks addressed to other sides alone. See the "Tasks and contract updates" section of the skill.

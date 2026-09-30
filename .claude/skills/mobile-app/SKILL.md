@@ -19,8 +19,7 @@ storefront does (`coderaxiy/emarket`, its `.claude/skills/storefront/SKILL.md` a
 - There is **no generated Dart SDK**. Like the storefront, use hand-written models that mirror
   `openapi/api.yaml`: one file per entity, each naming the schema it mirrors; one HTTP client
   (dio) with every path in a single `endpoints.dart`. When the spec changes, update the
-  matching model by hand from the spec diff. (If the owner later wants a generated Dart
-  client, that is a request to the contract repo, not a hand edit.)
+  matching model by hand from the spec diff.
 - Base URL is the host only (paths already include `/api/v1`). Dev backend: `http://localhost:8000`
   (Android emulator: `http://10.0.2.2:8000`).
 - **Auth is an httpOnly `access_token` cookie** from `POST /api/v1/auth/login`. Use a persistent
@@ -28,6 +27,27 @@ storefront does (`coderaxiy/emarket`, its `.claude/skills/storefront/SKILL.md` a
   call after login is 401. Store the jar in app-private storage.
 - Errors: one helper (like the storefront's `apiErrorMessage`, `isForbidden`) turns the
   standard error shape into a localized message. Never show raw server text blindly.
+
+## Tasks and contract updates
+`sdk-contract` is the exchange point with backend/frontend. Only read it (spec, docs, types)
+and read/write files in `tasks/`. Never edit anything else there. Our side is `mobile`.
+
+- **Session start:** `git pull` in `sdk-contract`, `npm run tasks`, pick up open tasks with
+  `to: mobile`. Don't touch tasks for other sides except to reply in a new task.
+- **"There are new updates in the SDK contract":**
+  1. Check: `git log --oneline ORIG_HEAD..HEAD`, `git diff --stat ORIG_HEAD..HEAD`. Read open
+     `to: mobile` tasks, then changed `docs/`, then the `openapi/api.yaml` diff (the exact list
+     of added/removed/changed endpoints, fields, enums, including ones no task mentions).
+  2. Verify: task and spec must agree; the spec is what's running. Find every use of the
+     changed endpoints/schemas in the app. If unclear or contradictory, don't guess: create a
+     reply task (`reply_to: <id>`, `to: backend`) and move on.
+  3. Implement: update the hand-written models/endpoints from the spec diff, then run
+     format/analyze/tests.
+  4. Close: in the task set `status: closed`, `closed: <today>`, add a `## Resolution`
+     (screens, files, commit). Then `npm run tasks:check`, commit and push `sdk-contract`.
+- **New request:** `npm run task:new -- <kebab-id> <backend|frontend>`; be concrete (endpoint,
+  fields, types, current vs expected, why). Status is only `open` or `closed`. Never delete tasks.
+- Don't invent endpoints or fields: if it isn't in the spec or docs, open a task.
 
 ## Money & numbers
 - Whole soʻm only. Hand-written `formatMoney` / `formatNumber` that print the same as the
