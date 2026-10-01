@@ -8,6 +8,9 @@ abstract final class AuthEndpoints {
   static const login = '/auth/login';
   static const logout = '/auth/logout';
   static const me = '/auth/me';
+  static const changePassword = '/auth/me/password';
+  static const passwordResetRequest = '/auth/password-reset/request';
+  static const passwordResetConfirm = '/auth/password-reset/confirm';
 }
 
 /// Public, no auth. docs/storefront-catalog-api.md

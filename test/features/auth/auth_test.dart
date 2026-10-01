@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:market_app/core/api/api_client.dart';
+import 'package:market_app/core/api/api_error.dart';
 import 'package:market_app/core/api/providers.dart';
 import 'package:market_app/features/auth/data/auth_repository.dart';
 
@@ -141,5 +144,138 @@ void main() {
     expect(await c.read(sessionProvider.future), isNotNull);
     c.read(sessionProvider.notifier).expire();
     expect(c.read(sessionProvider).value, isNull);
+  });
+
+  test('password reset: request then confirm, bodies as documented', () async {
+    final adapter = _Adapter({
+      'POST /auth/password-reset/request': (202, {'message': 'ok'}),
+      'POST /auth/password-reset/confirm': (200, {'message': 'ok'}),
+    });
+    final repo = _container(adapter).read(authRepositoryProvider);
+    await repo.requestPasswordReset('a@b.uz');
+    await repo.confirmPasswordReset(
+      email: 'a@b.uz',
+      code: '123456',
+      newPassword: 'longenough',
+    );
+    expect(adapter.bodies['POST /auth/password-reset/request'], {
+      'email': 'a@b.uz',
+    });
+    expect(adapter.bodies['POST /auth/password-reset/confirm'], {
+      'email': 'a@b.uz',
+      'code': '123456',
+      'new_password': 'longenough',
+    });
+  });
+
+  test(
+    'a wrong reset code is a 400 DioException with the backend text',
+    () async {
+      final adapter = _Adapter({
+        'POST /auth/password-reset/confirm': (
+          400,
+          {'detail': 'Invalid or expired code'},
+        ),
+      });
+      final repo = _container(adapter).read(authRepositoryProvider);
+      await expectLater(
+        repo.confirmPasswordReset(
+          email: 'a@b.uz',
+          code: '000000',
+          newPassword: 'longenough',
+        ),
+        throwsA(
+          isA<DioException>().having(
+            (e) => apiErrorMessage(e, 'fb'),
+            'message',
+            'Invalid or expired code',
+          ),
+        ),
+      );
+    },
+  );
+
+  test(
+    'updateProfile sends only given fields and updates the session',
+    () async {
+      final adapter = _Adapter({
+        'GET /auth/me': (200, {..._user, 'phone': null}),
+        'PATCH /auth/me': (
+          200,
+          {..._user, 'full_name': 'Ali', 'phone': '+998901234567'},
+        ),
+      });
+      final c = _container(adapter);
+      await c.read(sessionProvider.future);
+      await c
+          .read(sessionProvider.notifier)
+          .updateProfile(fullName: ' Ali ', phone: '+998901234567');
+      expect(adapter.bodies['PATCH /auth/me'], {
+        'full_name': 'Ali',
+        'phone': '+998901234567',
+      });
+      expect(c.read(sessionProvider).value!.phone, '+998901234567');
+
+      await c.read(sessionProvider.notifier).updateProfile(clearPhone: true);
+      expect(adapter.bodies['PATCH /auth/me'], {'phone': null});
+    },
+  );
+
+  test('changePassword posts both passwords; the session stays', () async {
+    final adapter = _Adapter({
+      'GET /auth/me': (200, _user),
+      'POST /auth/me/password': (200, {'message': 'ok'}),
+    });
+    final c = _container(adapter);
+    await c.read(sessionProvider.future);
+    await c
+        .read(sessionProvider.notifier)
+        .changePassword(currentPassword: 'old', newPassword: 'longenough');
+    expect(adapter.bodies['POST /auth/me/password'], {
+      'current_password': 'old',
+      'new_password': 'longenough',
+    });
+    expect(c.read(sessionProvider).value, isNotNull);
+  });
+
+  test('new password rule: 8 to 72 bytes', () {
+    expect(isValidNewPassword('1234567'), isFalse);
+    expect(isValidNewPassword('12345678'), isTrue);
+    expect(isValidNewPassword('a' * 72), isTrue);
+    expect(isValidNewPassword('a' * 73), isFalse);
+    expect(isValidNewPassword('я' * 36), isTrue); // 72 bytes
+    expect(isValidNewPassword('я' * 37), isFalse); // 74 bytes
+  });
+
+  group('401 means the session ended', () {
+    Future<int> run(
+      Map<String, (int, Object?)> routes,
+      String method,
+      String path,
+    ) async {
+      var expired = 0;
+      final dio = createApiClient(
+        cookieDir: Directory.systemTemp.createTempSync(),
+        host: 'http://x',
+        onUnauthorized: () => expired++,
+      )..httpClientAdapter = _Adapter(routes);
+      try {
+        await dio.request<Object?>(path, options: Options(method: method));
+      } on DioException catch (_) {}
+      return expired;
+    }
+
+    test('on an ordinary call', () async {
+      final n = await run({'GET /cart': (401, {})}, 'GET', '/cart');
+      expect(n, 1);
+    });
+
+    test('not on login, me or password-reset', () async {
+      expect(
+        await run({'POST /auth/login': (401, {})}, 'POST', '/auth/login'),
+        0,
+      );
+      expect(await run({'GET /auth/me': (401, {})}, 'GET', '/auth/me'), 0);
+    });
   });
 }
