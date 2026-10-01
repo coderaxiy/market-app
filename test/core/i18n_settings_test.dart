@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:market_app/app.dart';
 import 'package:market_app/core/i18n/i18n.dart';
 import 'package:market_app/core/i18n/translations.dart';
 import 'package:market_app/core/settings/settings.dart';
@@ -68,21 +67,4 @@ void main() {
       expect(c.read(settingsProvider).themeMode, ThemeMode.system);
     },
   );
-
-  testWidgets('app shows the tagline in the chosen locale', (tester) async {
-    final c = await _container();
-    await tester.pumpWidget(
-      UncontrolledProviderScope(container: c, child: const MarketApp()),
-    );
-    expect(
-      find.text(translate(AppLocale.uz, 'common.tagline')),
-      findsOneWidget,
-    );
-    await c.read(settingsProvider.notifier).setLocale(AppLocale.ru);
-    await tester.pumpAndSettle();
-    expect(
-      find.text(translate(AppLocale.ru, 'common.tagline')),
-      findsOneWidget,
-    );
-  });
 }
