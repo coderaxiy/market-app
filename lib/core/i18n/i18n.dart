@@ -1,3 +1,4 @@
+import 'app_translations.dart';
 import 'translations.dart';
 
 enum AppLocale {
@@ -31,7 +32,10 @@ typedef TFunction = String Function(String key, [Map<String, Object>? params]);
 /// `translate(AppLocale.en, 'header.searchFor', {'query': 'shoes'})`.
 /// An unknown key returns the key itself, so a gap is visible rather than a crash.
 String translate(AppLocale locale, String key, [Map<String, Object>? params]) {
-  final template = translations[locale.code]?[key] ?? key;
+  final template =
+      translations[locale.code]?[key] ??
+      appTranslations[locale.code]?[key] ??
+      key;
   if (params == null) return template;
   return template.replaceAllMapped(
     RegExp(r'\{(\w+)\}'),

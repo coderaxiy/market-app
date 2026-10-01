@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:market_app/core/i18n/app_translations.dart';
 import 'package:market_app/core/i18n/i18n.dart';
 import 'package:market_app/core/i18n/translations.dart';
 import 'package:market_app/core/settings/settings.dart';
@@ -23,6 +24,19 @@ void main() {
     for (final code in ['uz', 'ru']) {
       expect(translations[code]!.keys.toSet(), keys, reason: code);
     }
+  });
+
+  test('app-only strings: same keys in every locale, none shadowing storefront keys', () {
+    final keys = appTranslations['en']!.keys.toSet();
+    for (final code in ['uz', 'ru']) {
+      expect(appTranslations[code]!.keys.toSet(), keys, reason: code);
+    }
+    expect(keys.intersection(translations['en']!.keys.toSet()), isEmpty);
+    expect(translate(AppLocale.ru, 'auth.sendCode'), 'Отправить код');
+    expect(
+      translate(AppLocale.en, 'auth.resetCodeSubtitle', {'email': 'a@b.uz'}),
+      contains('a@b.uz'),
+    );
   });
 
   test('translate fills params and falls back to the key', () {

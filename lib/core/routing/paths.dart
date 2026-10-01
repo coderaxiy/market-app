@@ -11,6 +11,7 @@ abstract final class Paths {
   static const orders = '/orders';
   static const login = '/login';
   static const register = '/register';
+  static const forgotPassword = '/forgot-password';
 
   static String category(String slug) =>
       '/catalog/${Uri.encodeComponent(slug)}';

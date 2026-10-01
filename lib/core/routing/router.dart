@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/data/auth_repository.dart';
+import '../../features/auth/presentation/auth_pages.dart';
 import '../settings/settings.dart';
 import '../widgets/main_shell.dart';
 import '../widgets/state_views.dart';
@@ -122,11 +123,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Paths.login,
-        builder: (context, state) => const _Soon('auth.loginTitle'),
+        builder: (context, state) => AuthPage(
+          mode: AuthMode.login,
+          next: state.uri.queryParameters['next'],
+        ),
       ),
       GoRoute(
         path: Paths.register,
-        builder: (context, state) => const _Soon('auth.registerTitle'),
+        builder: (context, state) => AuthPage(
+          mode: AuthMode.register,
+          next: state.uri.queryParameters['next'],
+        ),
+      ),
+      GoRoute(
+        path: Paths.forgotPassword,
+        builder: (context, state) => const ForgotPasswordPage(),
       ),
       GoRoute(
         path: '/shops/:shop',

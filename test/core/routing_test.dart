@@ -83,7 +83,7 @@ Future<(ProviderContainer, _Adapter)> _pumpApp(WidgetTester tester) async {
 }
 
 String _location(ProviderContainer c) =>
-    c.read(routerProvider).routeInformationProvider.value.uri.toString();
+    c.read(routerProvider).routerDelegate.currentConfiguration.uri.toString();
 
 void main() {
   group('paths', () {
@@ -193,7 +193,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(_location(c), loginLocation('/orders/5'));
       expect(
-        find.text(translate(AppLocale.en, 'auth.loginTitle')),
+        find.text(translate(AppLocale.en, 'auth.loginSubtitle')),
         findsOneWidget,
       );
 
