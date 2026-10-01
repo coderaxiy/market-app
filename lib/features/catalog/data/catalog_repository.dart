@@ -43,6 +43,32 @@ class CatalogQuery {
   final Map<String, List<String>> attrs;
   final CatalogSort? sort;
 
+  CatalogQuery copyWith({
+    String? q,
+    int? categoryId,
+    CatalogSort? sort,
+    bool? inStock,
+  }) => CatalogQuery(
+    q: q ?? this.q,
+    categoryId: categoryId ?? this.categoryId,
+    brandIds: brandIds,
+    shopId: shopId,
+    priceMin: priceMin,
+    priceMax: priceMax,
+    inStock: inStock ?? this.inStock,
+    attrs: attrs,
+    sort: sort ?? this.sort,
+  );
+
+  /// Value equality, so a query can key a provider family.
+  @override
+  bool operator ==(Object other) =>
+      other is CatalogQuery &&
+      other.toParams().toString() == toParams().toString();
+
+  @override
+  int get hashCode => toParams().toString().hashCode;
+
   Map<String, dynamic> toParams() => {
     if (q != null && q!.trim().isNotEmpty) 'q': q!.trim(),
     'category_id': ?categoryId,

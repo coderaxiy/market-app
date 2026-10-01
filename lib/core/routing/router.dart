@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/presentation/auth_pages.dart';
+import '../../features/catalog/presentation/catalog_pages.dart';
 import '../settings/settings.dart';
 import '../widgets/main_shell.dart';
 import '../widgets/state_views.dart';
@@ -67,11 +68,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Paths.catalog,
-                builder: (context, state) => const _Soon('nav.catalog'),
+                builder: (context, state) => const CatalogPage(),
                 routes: [
                   GoRoute(
                     path: ':slug',
-                    builder: (context, state) => const _Soon('nav.catalog'),
+                    builder: (context, state) =>
+                        CatalogPage(slug: state.pathParameters['slug']),
                   ),
                 ],
               ),
@@ -81,7 +83,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Paths.search,
-                builder: (context, state) => const _Soon('nav.search'),
+                builder: (context, state) =>
+                    SearchPage(query: state.uri.queryParameters['q'] ?? ''),
               ),
             ],
           ),
