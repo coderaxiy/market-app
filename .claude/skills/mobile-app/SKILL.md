@@ -49,6 +49,16 @@ and read/write files in `tasks/`. Never edit anything else there. Our side is `m
   fields, types, current vs expected, why). Status is only `open` or `closed`. Never delete tasks.
 - Don't invent endpoints or fields: if it isn't in the spec or docs, open a task.
 
+## Session and push (from sdk-contract docs)
+- The `access_token` cookie lasts 7 days from login, fixed (not sliding), no refresh. A 401
+  on an ordinary call drops the user (`createApiClient(onUnauthorized:)` -> `expire()`); the
+  persistent cookie jar keeps it across restarts. Need longer? Open a task to backend.
+- Password reset is a 6-digit emailed code (no deep link): `requestPasswordReset`, then
+  `confirmPasswordReset`; it does not log in. `new_password` is 8-72 bytes.
+- Push: `PUT /devices` after login and on locale/token change, `DELETE /devices?token=` before
+  logout (both done by `DeviceService`). Real tokens need Firebase (`PushTokenSource`; until
+  then `NoPushTokenSource`). Backend delivery is console-only for now (docs/notifications-api.md).
+
 ## Money & numbers
 - Whole soʻm only. Hand-written `formatMoney` / `formatNumber` that print the same as the
   storefront: `15 000 soʻm` (uz) / `15 000 сум` (ru) / `15,000 UZS` (en). Do not use

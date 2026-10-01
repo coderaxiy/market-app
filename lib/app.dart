@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/i18n/i18n.dart';
 import 'core/settings/settings.dart';
 import 'core/theme/app_theme.dart';
+import 'features/notifications/application/device_sync.dart';
 
 class MarketApp extends ConsumerWidget {
   const MarketApp({super.key});
@@ -13,6 +14,7 @@ class MarketApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final t = ref.watch(tProvider);
+    ref.watch(deviceSyncProvider);
     return MaterialApp(
       title: t('common.appName'),
       theme: AppTheme.light,

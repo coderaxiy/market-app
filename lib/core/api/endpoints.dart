@@ -13,6 +13,12 @@ abstract final class AuthEndpoints {
   static const passwordResetConfirm = '/auth/password-reset/confirm';
 }
 
+/// Login required. docs/notifications-api.md
+abstract final class DeviceEndpoints {
+  /// `PUT` registers or refreshes this phone; `DELETE ?token=` stops pushes to it.
+  static const devices = '/devices';
+}
+
 /// Public, no auth. docs/storefront-catalog-api.md
 abstract final class CatalogEndpoints {
   /// `ProductCardRead[]`; total in the `X-Total-Count` header.

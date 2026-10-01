@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_error.dart';
 import '../../../core/api/endpoints.dart';
 import '../../../core/api/providers.dart';
+import '../../notifications/application/device_service.dart';
 import 'user.dart';
 
 /// Auth is the httpOnly `access_token` cookie set by login; the client's cookie jar
@@ -176,6 +177,8 @@ class SessionController extends AsyncNotifier<UserRead?> {
   );
 
   Future<void> logout() async {
+    // Stop pushes to this phone first: the cookie that authorises it is about to go.
+    await ref.read(deviceServiceProvider).unregister();
     await _repo.logout();
     state = const AsyncData(null);
   }
