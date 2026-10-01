@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/presentation/auth_pages.dart';
+import '../../features/cart/presentation/cart_page.dart';
 import '../../features/catalog/presentation/catalog_pages.dart';
 import '../../features/catalog/presentation/product_page.dart';
 import '../settings/settings.dart';
@@ -93,7 +94,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Paths.cart,
-                builder: (context, state) => const _Soon('nav.cart'),
+                builder: (context, state) => const CartPage(),
               ),
             ],
           ),
