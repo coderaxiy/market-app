@@ -75,4 +75,17 @@ abstract final class OrderEndpoints {
   /// `404` until the group reaches the pickup point: that means "still on the way".
   static String pickupStatus(int orderId, int groupId) =>
       '/orders/$orderId/groups/$groupId/pickup-status';
+
+  static String refundRequest(int orderLineId) =>
+      '/order-lines/$orderLineId/refund-request';
+
+  static String refund(int refundId) => '/refund-requests/$refundId';
+
+  static String escalateRefund(int refundId) =>
+      '/refund-requests/$refundId/escalate';
+}
+
+/// Login required. `?purpose=` is a query parameter, the body is multipart (`file`).
+abstract final class UploadEndpoints {
+  static const uploads = '/uploads';
 }
