@@ -6,6 +6,7 @@ import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/presentation/auth_pages.dart';
 import '../../features/cart/presentation/cart_page.dart';
 import '../../features/catalog/presentation/catalog_pages.dart';
+import '../../features/checkout/presentation/checkout_page.dart';
 import '../../features/catalog/presentation/product_page.dart';
 import '../settings/settings.dart';
 import '../widgets/main_shell.dart';
@@ -124,7 +125,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Paths.checkout,
-        builder: (context, state) => const _Soon('checkout.title'),
+        builder: (context, state) => const CheckoutPage(),
       ),
       GoRoute(
         path: Paths.login,

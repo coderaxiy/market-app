@@ -4,6 +4,10 @@
 // value wins: delete the duplicate here.
 
 const appEn = <String, String>{
+  'checkout.lastUsedNote': 'You picked this point last time.',
+  'checkout.editPoint': 'Change pickup point',
+  'checkout.hoursUnknown': 'Hours not listed',
+  'checkout.pointPhone': 'Phone: {phone}',
   'auth.forgotPassword': 'Forgot password?',
   'auth.resetTitle': 'Reset password',
   'auth.resetSubtitle': 'Enter your email and we’ll send you a 6-digit code.',
@@ -23,6 +27,10 @@ const appEn = <String, String>{
 };
 
 const appUz = <String, String>{
+  'checkout.lastUsedNote': 'Bu punktni oxirgi marta ham tanlagansiz.',
+  'checkout.editPoint': 'Topshirish punktini almashtirish',
+  'checkout.hoursUnknown': 'Ish vaqti koʻrsatilmagan',
+  'checkout.pointPhone': 'Telefon: {phone}',
   'auth.forgotPassword': 'Parolni unutdingizmi?',
   'auth.resetTitle': 'Parolni tiklash',
   'auth.resetSubtitle': 'Emailingizni kiriting, biz 6 xonali kod yuboramiz.',
@@ -42,6 +50,10 @@ const appUz = <String, String>{
 };
 
 const appRu = <String, String>{
+  'checkout.lastUsedNote': 'Вы выбирали этот пункт в прошлый раз.',
+  'checkout.editPoint': 'Сменить пункт выдачи',
+  'checkout.hoursUnknown': 'Часы работы не указаны',
+  'checkout.pointPhone': 'Телефон: {phone}',
   'auth.forgotPassword': 'Забыли пароль?',
   'auth.resetTitle': 'Восстановление пароля',
   'auth.resetSubtitle': 'Введите email, и мы отправим 6-значный код.',
