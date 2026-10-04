@@ -15,6 +15,8 @@ import '../application/orders_logic.dart';
 import '../application/orders_providers.dart';
 import '../data/order.dart';
 import '../data/order_repository.dart';
+import '../data/refund.dart';
+import 'return_sheet.dart';
 import 'order_widgets.dart';
 
 /// `/orders/:id`. With `placed` (right after checkout) it opens with a thank-you banner.
@@ -353,7 +355,8 @@ class _GroupSectionState extends ConsumerState<_GroupSection> {
                 ),
               ),
             const Divider(height: 24),
-            for (final line in group.lines) _LineRow(line: line, intl: intl),
+            for (final line in group.lines)
+              _LineRow(orderId: widget.order.id, line: line, intl: intl),
             if (group.canCancel) ...[
               const SizedBox(height: 8),
               Text(t('cancel.hint'), style: subtle),
@@ -373,8 +376,13 @@ class _GroupSectionState extends ConsumerState<_GroupSection> {
 }
 
 class _LineRow extends ConsumerWidget {
-  const _LineRow({required this.line, required this.intl});
+  const _LineRow({
+    required this.orderId,
+    required this.line,
+    required this.intl,
+  });
 
+  final int orderId;
   final OrderLineRead line;
   final String intl;
 
@@ -385,52 +393,193 @@ class _LineRow extends ConsumerWidget {
     final variant = line.variantAttributes?.values.join(' / ');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              width: 56,
-              height: 56,
-              child: ProductImage(line.imageUrl),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  line.productTitleSnapshot,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: ProductImage(line.imageUrl),
                 ),
-                if (variant != null && variant.isNotEmpty)
-                  Text(
-                    variant,
-                    style: text.bodySmall?.copyWith(
-                      color: colors.mutedForeground,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      line.productTitleSnapshot,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                Text(
-                  '${line.quantity} × ${formatMoney(line.unitPrice, intl)}',
-                  style: text.bodySmall?.copyWith(
-                    color: colors.mutedForeground,
-                  ),
+                    if (variant != null && variant.isNotEmpty)
+                      Text(
+                        variant,
+                        style: text.bodySmall?.copyWith(
+                          color: colors.mutedForeground,
+                        ),
+                      ),
+                    Text(
+                      '${line.quantity} × ${formatMoney(line.unitPrice, intl)}',
+                      style: text.bodySmall?.copyWith(
+                        color: colors.mutedForeground,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Text(
+                formatMoney(line.lineTotal, intl),
+                style: text.titleSmall?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
           ),
-          Text(
-            formatMoney(line.lineTotal, intl),
-            style: text.titleSmall?.copyWith(
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
+          _ReturnArea(orderId: orderId, line: line),
         ],
       ),
     );
+  }
+}
+
+/// What the buyer can do about returning one line, and where a return stands. The rules
+/// are `OrderLineRead.returnState` (docs/orders-and-payments-api.md §4).
+class _ReturnArea extends ConsumerStatefulWidget {
+  const _ReturnArea({required this.orderId, required this.line});
+
+  final int orderId;
+  final OrderLineRead line;
+
+  @override
+  ConsumerState<_ReturnArea> createState() => _ReturnAreaState();
+}
+
+class _ReturnAreaState extends ConsumerState<_ReturnArea> {
+  var _busy = false;
+
+  Future<void> _request() async {
+    final t = ref.read(tProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    final sent = await showReturnSheet(context, widget.line);
+    if (!sent) return;
+    ref.invalidate(orderProvider(widget.orderId));
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(t('return.sent'))));
+  }
+
+  /// Once per request; the team's decision is final.
+  Future<void> _escalate(int refundId) async {
+    final t = ref.read(tProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    try {
+      await ref.read(orderRepositoryProvider).escalate(refundId);
+      ref.invalidate(orderProvider(widget.orderId));
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(t('return.escalated'))));
+    } catch (error) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(apiErrorMessage(error, t('return.escalateFailed'))),
+          ),
+        );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = ref.watch(tProvider);
+    final colors = AppColors.of(context);
+    final subtle = Theme.of(context).textTheme.bodySmall
+        ?.copyWith(color: colors.mutedForeground);
+    final line = widget.line;
+    final request = line.refundRequest;
+    Widget note(String text, {Color? color}) => Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Text(text, style: subtle?.copyWith(color: color)),
+    );
+
+    switch (line.returnState()) {
+      case ReturnState.none:
+        return const SizedBox.shrink();
+      case ReturnState.canRequest:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (line.returnDeadline != null)
+              note(
+                t('return.deadline', {
+                  'date': formatDate(line.returnDeadline!),
+                }),
+              ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton(
+                onPressed: _request,
+                child: Text(t('return.button')),
+              ),
+            ),
+          ],
+        );
+      case ReturnState.requested:
+        return note(t('return.requested'));
+      case ReturnState.rejectedCanEscalate || ReturnState.rejectedFinal:
+        final canEscalate =
+            line.returnState() == ReturnState.rejectedCanEscalate;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            note(t('return.rejected'), color: colors.destructive),
+            if (request?.resolutionNote != null)
+              note(
+                t('return.rejectedReason', {
+                  'reason': request!.resolutionNote!,
+                }),
+              ),
+            if (canEscalate && request != null)
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton(
+                  onPressed: _busy ? null : () => _escalate(request.id),
+                  child: Text(t('return.escalate')),
+                ),
+              )
+            else
+              note(t('return.final')),
+          ],
+        );
+      case ReturnState.returnPending:
+        final point = request?.returnPoint;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (point != null)
+              note(
+                t('return.bringTo', {'name': point.name}),
+                color: colors.foreground,
+              ),
+            if (point != null && point.address.display.isNotEmpty)
+              note(point.address.display),
+            note(t('return.bringHint')),
+          ],
+        );
+      case ReturnState.returnedToPoint:
+        return note(t('return.handedIn'));
+      case ReturnState.refunded:
+        return note(t('return.refunded'), color: colors.success);
+    }
   }
 }
 
