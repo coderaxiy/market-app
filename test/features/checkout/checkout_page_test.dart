@@ -150,6 +150,29 @@ class _Adapter implements HttpClientAdapter {
     } else if (key == 'POST /checkout') {
       result = checkout;
       if (checkout.$1 == 200) lines = [];
+    } else if (key == 'GET /orders/9') {
+      result = (
+        200,
+        {
+          'id': 9,
+          'buyer_id': 4,
+          'order_number': 'ORD-9',
+          'status': 'paid',
+          'total_amount': '100000.00',
+          'recipient': {
+            'full_name': 'Ali Valiyev',
+            'phone': '+998901234567',
+            'notes': null,
+          },
+          'pickup_point': null,
+          'payment_method': 'cash_on_delivery',
+          'payment_reference': null,
+          'placed_at': '2026-10-01T10:00:00Z',
+          'created_at': '2026-10-01T10:00:00Z',
+          'updated_at': '2026-10-01T10:00:00Z',
+          'groups': <Object>[],
+        },
+      );
     } else if (key.startsWith('PATCH /cart/items/')) {
       final id = int.parse(options.path.split('/').last);
       final line = lines.firstWhere((l) => l['id'] == id);
@@ -314,7 +337,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AppBar),
-          matching: find.text(t('nav.orders')),
+          matching: find.text(t('order.title', {'number': 'ORD-9'})),
         ),
         findsOneWidget,
       );
@@ -370,7 +393,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AppBar),
-          matching: find.text(t('nav.orders')),
+          matching: find.text(t('order.title', {'number': 'ORD-9'})),
         ),
         findsOneWidget,
       );

@@ -7,6 +7,8 @@ import '../../features/auth/presentation/auth_pages.dart';
 import '../../features/cart/presentation/cart_page.dart';
 import '../../features/catalog/presentation/catalog_pages.dart';
 import '../../features/checkout/presentation/checkout_page.dart';
+import '../../features/orders/presentation/order_detail_page.dart';
+import '../../features/orders/presentation/orders_list_page.dart';
 import '../../features/catalog/presentation/product_page.dart';
 import '../settings/settings.dart';
 import '../widgets/main_shell.dart';
@@ -115,11 +117,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Full-screen routes above the tabs.
       GoRoute(
         path: Paths.orders,
-        builder: (context, state) => const _Soon('nav.orders'),
+        builder: (context, state) => const OrdersListPage(),
         routes: [
           GoRoute(
             path: ':id',
-            builder: (context, state) => const _Soon('nav.orders'),
+            builder: (context, state) => OrderDetailPage(
+              orderId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
+              placed: state.uri.queryParameters['placed'] == '1',
+            ),
           ),
         ],
       ),

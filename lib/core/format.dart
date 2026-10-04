@@ -47,3 +47,19 @@ String formatMoney(String amount, String locale) =>
 /// Client-side sum before the server confirms a total. Prefer server totals.
 int sumMoney(Iterable<String> amounts) =>
     amounts.fold(0, (total, amount) => total + toTiyin(amount));
+
+String _two(int n) => n.toString().padLeft(2, '0');
+
+/// `04.10.2026 14:30` in the phone's local time (the API sends UTC). Hand-made like the
+/// money format: `DateFormat` needs locale data that isn't loaded for every language.
+String formatDateTime(DateTime moment) {
+  final local = moment.toLocal();
+  return '${_two(local.day)}.${_two(local.month)}.${local.year} '
+      '${_two(local.hour)}:${_two(local.minute)}';
+}
+
+/// `04.10.2026`.
+String formatDate(DateTime moment) {
+  final local = moment.toLocal();
+  return '${_two(local.day)}.${_two(local.month)}.${local.year}';
+}
