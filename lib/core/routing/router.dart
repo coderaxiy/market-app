@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/data/auth_repository.dart';
+import '../../features/auth/presentation/account_page.dart';
 import '../../features/auth/presentation/auth_pages.dart';
 import '../../features/cart/presentation/cart_page.dart';
 import '../../features/catalog/presentation/catalog_pages.dart';
@@ -105,7 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Paths.account,
-                builder: (context, state) => const _Soon('account.title'),
+                builder: (context, state) => const AccountPage(),
                 routes: [
                   GoRoute(path: 'orders', redirect: (_, state) => Paths.orders),
                 ],

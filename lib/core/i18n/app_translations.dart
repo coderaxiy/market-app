@@ -4,6 +4,15 @@
 // value wins: delete the duplicate here.
 
 const appEn = <String, String>{
+  'account.phone': 'Phone',
+  'account.edit': 'Edit profile',
+  'account.save': 'Save',
+  'account.saved': 'Saved',
+  'account.saveFailed': 'Couldn’t save. Please try again.',
+  'account.changePassword': 'Change password',
+  'account.currentPassword': 'Current password',
+  'account.passwordChanged': 'Password changed',
+  'account.passwordFailed': 'Couldn’t change the password. Please try again.',
   'return.button': 'Return this item',
   'return.title': 'Return an item',
   'return.refundNote':
@@ -62,6 +71,16 @@ const appEn = <String, String>{
 };
 
 const appUz = <String, String>{
+  'account.phone': 'Telefon',
+  'account.edit': 'Profilni tahrirlash',
+  'account.save': 'Saqlash',
+  'account.saved': 'Saqlandi',
+  'account.saveFailed': 'Saqlab boʻlmadi. Qayta urinib koʻring.',
+  'account.changePassword': 'Parolni oʻzgartirish',
+  'account.currentPassword': 'Joriy parol',
+  'account.passwordChanged': 'Parol oʻzgartirildi',
+  'account.passwordFailed':
+      'Parolni oʻzgartirib boʻlmadi. Qayta urinib koʻring.',
   'return.button': 'Mahsulotni qaytarish',
   'return.title': 'Mahsulotni qaytarish',
   'return.refundNote':
@@ -120,6 +139,15 @@ const appUz = <String, String>{
 };
 
 const appRu = <String, String>{
+  'account.phone': 'Телефон',
+  'account.edit': 'Изменить профиль',
+  'account.save': 'Сохранить',
+  'account.saved': 'Сохранено',
+  'account.saveFailed': 'Не удалось сохранить. Попробуйте ещё раз.',
+  'account.changePassword': 'Сменить пароль',
+  'account.currentPassword': 'Текущий пароль',
+  'account.passwordChanged': 'Пароль изменён',
+  'account.passwordFailed': 'Не удалось сменить пароль. Попробуйте ещё раз.',
   'return.button': 'Вернуть товар',
   'return.title': 'Возврат товара',
   'return.refundNote':
