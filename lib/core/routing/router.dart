@@ -12,23 +12,11 @@ import '../../features/checkout/presentation/checkout_page.dart';
 import '../../features/orders/presentation/order_detail_page.dart';
 import '../../features/orders/presentation/orders_list_page.dart';
 import '../../features/catalog/presentation/product_page.dart';
+import '../../features/catalog/presentation/shop_page.dart';
 import '../settings/settings.dart';
 import '../widgets/main_shell.dart';
 import '../widgets/state_views.dart';
 import 'paths.dart';
-
-/// Screens not built yet show [ComingSoon] under their final path, so navigation, deep links
-/// and the auth redirects can be built and tested first. Replace each `_Soon` with the real
-/// screen as it lands.
-class _Soon extends ConsumerWidget {
-  const _Soon(this.titleKey);
-
-  final String titleKey;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ComingSoon(title: ref.watch(tProvider)(titleKey));
-}
 
 /// Redirect rules (same as the storefront's middleware):
 /// - protected screens (`/checkout`, `/orders`, `/account`) need a session, else
@@ -154,7 +142,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/shops/:shop',
-        builder: (context, state) => const _Soon('nav.catalog'),
+        builder: (context, state) =>
+            ShopPage(slug: state.pathParameters['shop']!),
         routes: [
           GoRoute(
             path: ':product',

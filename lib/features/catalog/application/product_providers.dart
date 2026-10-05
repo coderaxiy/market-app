@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/api_error.dart';
 import '../data/catalog_repository.dart';
 import '../data/category.dart';
+import '../data/common.dart';
 import '../data/product.dart';
 
 /// The shop slug and product slug of `/shops/:shop/:product`.
@@ -35,3 +36,9 @@ final productRailProvider =
               .items,
       retry: retryTransient,
     );
+
+/// A shop's public profile by slug. `404 "Shop not found"` unless the shop is active.
+final shopProvider = FutureProvider.family<ShopPublicRead, String>(
+  (ref, slug) => ref.watch(catalogRepositoryProvider).shopBySlug(slug),
+  retry: retryTransient,
+);
