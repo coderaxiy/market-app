@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Dev backend over plain http on the local network. Remove for release. -->
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to the emarket backend on your local network while testing.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Choose photos to show the shop why you are returning an item.</string>
 	<key>NSCameraUsageDescription</key>
