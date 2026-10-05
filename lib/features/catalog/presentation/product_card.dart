@@ -6,6 +6,8 @@ import '../../../core/format.dart';
 import '../../../core/routing/paths.dart';
 import '../../../core/settings/settings.dart';
 import '../../../core/theme/app_colors.dart';
+import '../application/product_providers.dart';
+import '../data/catalog_repository.dart';
 import '../data/product.dart';
 
 /// A product photo, or a quiet placeholder when there is none or it fails to load.
@@ -135,6 +137,69 @@ class ProductCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A horizontal row of cards. Hidden while loading, on failure, and when it would be
+/// empty after leaving out [exclude]d products.
+class ProductRail extends ConsumerWidget {
+  const ProductRail({
+    super.key,
+    required this.title,
+    required this.query,
+    this.exclude = const {},
+    this.onSeeAll,
+  });
+
+  final String title;
+  final CatalogQuery query;
+  final Set<int> exclude;
+
+  /// Shows a "See all" link next to the title when set.
+  final VoidCallback? onSeeAll;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(productRailProvider(query)).value;
+    final shown = [
+      for (final item in items ?? const <ProductCardRead>[])
+        if (!exclude.contains(item.id)) item,
+    ];
+    if (shown.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              if (onSeeAll != null)
+                TextButton(
+                  onPressed: onSeeAll,
+                  child: Text(ref.watch(tProvider)('product.seeAll')),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 300,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: shown.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, i) =>
+                SizedBox(width: 170, child: ProductCard(shown[i])),
+          ),
+        ),
+      ],
     );
   }
 }

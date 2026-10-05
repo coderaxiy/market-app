@@ -7,6 +7,7 @@ import '../../features/auth/presentation/account_page.dart';
 import '../../features/auth/presentation/auth_pages.dart';
 import '../../features/cart/presentation/cart_page.dart';
 import '../../features/catalog/presentation/catalog_pages.dart';
+import '../../features/catalog/presentation/home_page.dart';
 import '../../features/checkout/presentation/checkout_page.dart';
 import '../../features/orders/presentation/order_detail_page.dart';
 import '../../features/orders/presentation/orders_list_page.dart';
@@ -66,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Paths.home,
-                builder: (context, state) => const _Soon('nav.home'),
+                builder: (context, state) => const HomePage(),
               ),
             ],
           ),

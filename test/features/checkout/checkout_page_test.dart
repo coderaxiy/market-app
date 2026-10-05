@@ -277,13 +277,10 @@ void main() {
     await tester.tap(find.text('Samarkand').last);
     await tester.pumpAndSettle();
     expect(find.text('Registan point'), findsOneWidget);
+    // Today's hours come from the point's data: which day it is decides the text.
     expect(
-      find
-              .text(t('checkout.todayHours', {'hours': '10–16'}))
-              .evaluate()
-              .length +
-          find.text(t('checkout.hoursUnknown')).evaluate().length,
-      1,
+      find.textContaining(t('checkout.todayHours', {'hours': ''}).trim()),
+      findsOneWidget,
     );
     await tester.tap(find.text('Registan point'));
     await tester.pumpAndSettle();

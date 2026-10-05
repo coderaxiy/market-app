@@ -333,12 +333,12 @@ class _ProductViewState extends ConsumerState<_ProductView> {
               ],
             ),
           ),
-          _Rail(
+          ProductRail(
             title: t('product.similar'),
             query: CatalogQuery(categoryId: _product.category.id),
             exclude: {_product.id},
           ),
-          _Rail(
+          ProductRail(
             title: t('product.moreFromShop', {'shop': _product.shop.name}),
             query: CatalogQuery(shopId: _product.shop.id),
             exclude: {_product.id},
@@ -563,48 +563,4 @@ class _InfoTile extends StatelessWidget {
     title: Text(title),
     subtitle: Text(body),
   );
-}
-
-/// A horizontal row of cards. Hidden while loading, on failure, and when it would be
-/// empty after leaving out the product itself.
-class _Rail extends ConsumerWidget {
-  const _Rail({
-    required this.title,
-    required this.query,
-    required this.exclude,
-  });
-
-  final String title;
-  final CatalogQuery query;
-  final Set<int> exclude;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final items = ref.watch(productRailProvider(query)).value;
-    final shown = [
-      for (final item in items ?? const <ProductCardRead>[])
-        if (!exclude.contains(item.id)) item,
-    ];
-    if (shown.isEmpty) return const SizedBox.shrink();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ),
-        SizedBox(
-          height: 300,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: shown.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
-            itemBuilder: (_, i) =>
-                SizedBox(width: 170, child: ProductCard(shown[i])),
-          ),
-        ),
-      ],
-    );
-  }
 }

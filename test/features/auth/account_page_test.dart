@@ -254,12 +254,6 @@ void main() {
     await _tap(tester, find.text(t('header.signOut')));
     expect(adapter.calls, contains('POST /auth/logout'));
     expect(c.read(sessionProvider).value, isNull);
-    expect(
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text(t('nav.home')),
-      ),
-      findsOneWidget,
-    );
+    expect(find.text(t('home.heroTitle')), findsOneWidget);
   });
 }

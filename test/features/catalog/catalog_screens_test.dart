@@ -153,6 +153,7 @@ Future<(ProviderContainer, _Adapter)> _pump(
     UncontrolledProviderScope(container: c, child: const MarketApp()),
   );
   await tester.pumpAndSettle();
+  adapter.productRequests.clear(); // the home page asked for its own rows
   c.read(routerProvider).go(path);
   await tester.pumpAndSettle();
   return (c, adapter);
