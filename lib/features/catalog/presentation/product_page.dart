@@ -199,20 +199,22 @@ class _ProductViewState extends ConsumerState<_ProductView> {
                 ),
               ),
               const SizedBox(width: 12),
-              SizedBox(
-                width: 180,
-                child: FilledButton.icon(
-                  onPressed: _canAdd ? _addToCart : null,
-                  icon: _adding
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.shopping_bag_outlined),
-                  label: Text(
-                    _inStock ? t('product.addToCart') : t('catalog.outOfStock'),
-                  ),
+              // Sized to its text, so the label stays on one line in every language.
+              FilledButton.icon(
+                onPressed: _canAdd ? _addToCart : null,
+                // The theme makes buttons full-width; here it must fit its text.
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 48)),
+                icon: _adding
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.shopping_bag_outlined),
+                label: Text(
+                  _inStock ? t('product.addToCart') : t('catalog.outOfStock'),
+                  maxLines: 1,
+                  softWrap: false,
                 ),
               ),
             ],
