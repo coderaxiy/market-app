@@ -48,15 +48,25 @@ void main() {
     expect(translate(AppLocale.en, 'header.searchFor'), contains('{query}'));
   });
 
-  test('pickTranslation goes current -> en -> first', () {
+  test('pickTranslation goes current -> uz -> first', () {
     final entries = [
       {'locale': 'ru', 'name': 'Р'},
+      {'locale': 'uz', 'name': 'U'},
       {'locale': 'en', 'name': 'E'},
     ];
     String loc(Map<String, String> e) => e['locale']!;
     expect(pickTranslation(entries, loc, AppLocale.ru)!['name'], 'Р');
-    expect(pickTranslation(entries, loc, AppLocale.uz)!['name'], 'E');
-    expect(pickTranslation([entries.first], loc, AppLocale.uz)!['name'], 'Р');
+    expect(
+      pickTranslation(entries.sublist(0, 1), loc, AppLocale.uz)!['name'],
+      'Р',
+    );
+    expect(
+      pickTranslation(entries.sublist(1), loc, AppLocale.ru)!['name'],
+      'U',
+    );
+    expect(pickTranslation(entries, loc, AppLocale.en)!['name'], 'E');
+    expect(pickTranslation([entries.last], loc, AppLocale.ru)!['name'], 'E');
+    expect(AppLocale.offered, [AppLocale.uz, AppLocale.ru]);
     expect(pickTranslation(<Map<String, String>>[], loc, AppLocale.uz), isNull);
   });
 

@@ -120,7 +120,7 @@ class AccountPage extends ConsumerWidget {
                   SegmentedButton<AppLocale>(
                     showSelectedIcon: false,
                     segments: [
-                      for (final locale in AppLocale.values)
+                      for (final locale in AppLocale.offered)
                         ButtonSegment(
                           value: locale,
                           label: Text(locale.nativeName, maxLines: 1),

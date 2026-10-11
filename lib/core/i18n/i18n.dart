@@ -16,6 +16,11 @@ enum AppLocale {
   /// BCP 47 tag for number and date formatting (`format.dart` takes this).
   final String intlTag;
 
+  /// The languages a buyer can pick. Marketplace content and backend errors are Uzbek
+  /// and Russian only (product decision, 2026-10-01). `en` stays in the enum only as the
+  /// reference dictionary (storefront parity, tests); it is never offered or sent.
+  static const offered = [uz, ru];
+
   static AppLocale? fromCode(String? code) {
     for (final locale in values) {
       if (locale.code == code) return locale;
@@ -48,13 +53,14 @@ TFunction createT(AppLocale locale) =>
     (key, [params]) => translate(locale, key, params);
 
 /// Pick a localized entry from API `translations: [{ locale, name }]`
-/// (current -> en -> first), like the storefront's `pickTranslation`.
+/// (current -> uz -> first). Content is uz and ru only; old rows may still carry `en`
+/// or lack one of the two, so any available translation beats none.
 T? pickTranslation<T>(
   List<T> entries,
   String Function(T entry) localeOf,
   AppLocale locale,
 ) {
-  for (final code in [locale.code, AppLocale.en.code]) {
+  for (final code in [locale.code, defaultLocale.code]) {
     for (final entry in entries) {
       if (localeOf(entry) == code) return entry;
     }

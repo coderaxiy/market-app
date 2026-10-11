@@ -65,7 +65,7 @@ and read/write files in `tasks/`. Never edit anything else there. Our side is `m
   `NumberFormat` with the `uz` locale: data is inconsistent across platforms.
 
 ## i18n
-- Locales: `uz` (primary), `ru`, `en`. Mirror the key shape of emarket's `src/i18n/locales/en.ts`
+- Locales: `uz` (primary) and `ru` are offered; `en` is only the reference dictionary (not offered, product decision 2026-10-01). Mirror the key shape of emarket's `src/i18n/locales/en.ts`
   so translations can be shared/ported. Same `pickTranslation` fallback behavior for
   server-provided multilingual fields.
 - Locale change is app-wide and persisted.
