@@ -100,6 +100,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(path: 'orders', redirect: (_, state) => Paths.orders),
                 ],
               ),
+              // Login, register and forgot-password live in the profile tab, so
+              // the bottom menu stays visible and the buyer can leave any time.
+              GoRoute(
+                path: Paths.login,
+                builder: (context, state) => AuthPage(
+                  mode: AuthMode.login,
+                  next: state.uri.queryParameters['next'],
+                ),
+              ),
+              GoRoute(
+                path: Paths.register,
+                builder: (context, state) => AuthPage(
+                  mode: AuthMode.register,
+                  next: state.uri.queryParameters['next'],
+                ),
+              ),
+              GoRoute(
+                path: Paths.forgotPassword,
+                builder: (context, state) => const ForgotPasswordPage(),
+              ),
             ],
           ),
         ],
@@ -121,24 +141,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Paths.checkout,
         builder: (context, state) => const CheckoutPage(),
-      ),
-      GoRoute(
-        path: Paths.login,
-        builder: (context, state) => AuthPage(
-          mode: AuthMode.login,
-          next: state.uri.queryParameters['next'],
-        ),
-      ),
-      GoRoute(
-        path: Paths.register,
-        builder: (context, state) => AuthPage(
-          mode: AuthMode.register,
-          next: state.uri.queryParameters['next'],
-        ),
-      ),
-      GoRoute(
-        path: Paths.forgotPassword,
-        builder: (context, state) => const ForgotPasswordPage(),
       ),
       GoRoute(
         path: '/shops/:shop',
