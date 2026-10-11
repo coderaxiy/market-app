@@ -12,6 +12,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   late final ProviderContainer container;
   final dio = await createDefaultApiClient(
+    language: () => container.read(settingsProvider).locale.code,
     onUnauthorized: () => container.read(sessionProvider.notifier).expire(),
   );
   container = ProviderContainer(

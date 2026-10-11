@@ -25,6 +25,7 @@ const apiPrefix = '/api/v1';
 Dio createApiClient({
   required Directory cookieDir,
   String host = apiHost,
+  String Function()? language,
   void Function()? onUnauthorized,
 }) {
   final dio = Dio(
@@ -35,6 +36,18 @@ Dio createApiClient({
       receiveTimeout: const Duration(seconds: 30),
     ),
   );
+  if (language != null) {
+    // The backend answers errors in this language (`uz` or `ru`; anything else is
+    // treated as `uz`), docs/api-standards.md "Language".
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          options.headers['Accept-Language'] = language();
+          handler.next(options);
+        },
+      ),
+    );
+  }
   dio.interceptors.add(
     CookieManager(PersistCookieJar(storage: FileStorage(cookieDir.path))),
   );

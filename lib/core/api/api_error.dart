@@ -24,6 +24,16 @@ String apiErrorMessage(Object error, String fallback) {
   return detail is String && detail.trim().isNotEmpty ? detail : fallback;
 }
 
+/// Stable machine-readable `code` (e.g. `auth.session_expired`) on errors the backend
+/// raised through its message catalog; `null` when it has none. Branch on this, never on
+/// the translated `detail` text.
+String? apiErrorCode(Object error) {
+  if (error is! DioException) return null;
+  final data = error.response?.data;
+  final code = data is Map<String, dynamic> ? data['code'] : null;
+  return code is String && code.isNotEmpty ? code : null;
+}
+
 /// Riverpod retries failed providers by default, 4xx included. Use this as the `retry`
 /// of API-backed providers: only transient failures (network, 5xx), a few times, backing off.
 Duration? retryTransient(int count, Object error) =>

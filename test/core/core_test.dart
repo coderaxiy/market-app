@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:market_app/core/api/api_client.dart';
 import 'package:market_app/core/api/api_error.dart';
 import 'package:market_app/core/api/endpoints.dart';
 import 'package:market_app/core/format.dart';
@@ -62,8 +66,55 @@ void main() {
     });
   });
 
+  test('error code is read when the backend sends one', () {
+    expect(
+      apiErrorCode(_error(401, {'detail': 'x', 'code': 'auth.a'})),
+      'auth.a',
+    );
+    expect(apiErrorCode(_error(400, {'detail': 'x'})), isNull);
+    expect(apiErrorCode(StateError('x')), isNull);
+  });
+
+  test('every request carries the current app language', () async {
+    var language = 'ru';
+    final seen = <String?>[];
+    final dio = createApiClient(
+      cookieDir: Directory.systemTemp.createTempSync(),
+      host: 'http://x',
+      language: () => language,
+    )..httpClientAdapter = _Capture(seen);
+    await dio.get<Object?>('/a');
+    language = 'uz';
+    await dio.get<Object?>('/b');
+    expect(seen, ['ru', 'uz']);
+  });
+
   test('endpoints encode slugs', () {
     expect(CatalogEndpoints.shopBySlug('a b'), '/shops/by-slug/a%20b');
     expect(OrderEndpoints.cancelGroup(1, 2), '/orders/1/groups/2/cancel');
   });
+}
+
+class _Capture implements HttpClientAdapter {
+  _Capture(this.seen);
+  final List<String?> seen;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    seen.add(options.headers['Accept-Language'] as String?);
+    return ResponseBody.fromString(
+      '{}',
+      200,
+      headers: {
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }

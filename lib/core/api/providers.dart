@@ -13,9 +13,16 @@ final dioProvider = Provider<Dio>(
 );
 
 /// The real client: cookies (`access_token`, `cart_token`) persist in app-private storage.
-Future<Dio> createDefaultApiClient({void Function()? onUnauthorized}) async {
+Future<Dio> createDefaultApiClient({
+  String Function()? language,
+  void Function()? onUnauthorized,
+}) async {
   final support = await getApplicationSupportDirectory();
   final cookieDir = Directory('${support.path}/cookies')
     ..createSync(recursive: true);
-  return createApiClient(cookieDir: cookieDir, onUnauthorized: onUnauthorized);
+  return createApiClient(
+    cookieDir: cookieDir,
+    language: language,
+    onUnauthorized: onUnauthorized,
+  );
 }
